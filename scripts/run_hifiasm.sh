@@ -1,8 +1,8 @@
 #!/bin/bash
 
-INPUT=$1
-OUTPUT=$2
+READS=$1
+ASM=$2
 
-hifiasm -o _tmp.asm -t12 $INPUT
-gfatools gfa2fa _tmp.asm.bp.p_utg.gfa | seqtk seq -A -l0 > $OUTPUT
+hifiasm -o _tmp.asm -t12 $READS
+gfatools gfa2fa _tmp.asm.bp.p_utg.gfa | seqtk seq -A -l0 > $ASM
 rm _tmp.asm.{bp,ec,ovlp}.*
