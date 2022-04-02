@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if (($# != 3))
+then
+    echo "usage: $0 <reads.fa> <reference.fa> <mapping.bam>"
+    exit
+fi
+
 READS=$1
 REF=$2
 MAPPING=$3

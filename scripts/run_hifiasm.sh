@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if (($# != 2))
+then
+    echo "usage: $0 <reads.fa> <assembly.fa>"
+    exit
+fi
+
 READS=$1
 ASM=$2
 
