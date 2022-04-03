@@ -1,3 +1,4 @@
+import sys
 
 class BidirectedOverlapGraph(object):
     def __init__(self, alignments, maxOverhang=25):
@@ -47,6 +48,19 @@ class BidirectedOverlapGraph(object):
                 self.graph[seqH-1] = {}
             self.graph[seqH-1][seqV-1] = eT
 
+    def write_gml(self, filename):
+        with open(filename, "w") as f:
+            f.write("graph\n[\n\tdirected 1\n")
+            for i in self.graph:
+                f.write("\tnode\n\t[\n\t\tid " + str(i) + "\n\t]\n")
+            for seqV in self.graph:
+                for seqH in self.graph[seqV]:
+                    e = self.graph[seqV][seqH]
+                    f.write("")
+                    f.write("\tedge\n\t[\n\t\tsource {}\n\t\ttarget {}\n\t\tdir {}\n\t\tsuffix {}\n\t]\n".format(seqV, seqH, e['dir'], e['suffix']))
+            f.write("]");
+
+
     def tofile(self, filename):
         with open(filename, "w") as f:
             f.write("\t".join(["row","col","transpose","dir","suffix","prefix","rc","begV","endV","begH","endH","lenV","lenH"]) + "\n")
@@ -65,4 +79,12 @@ class BidirectedOverlapGraph(object):
                     yield [int(v) for v in line.rstrip().split()]
         return cls(fileread_generator(), maxOverhang)
 
+    @classmethod
+    def direct_to_file(cls, filename, output_prefix, maxOverhang=25):
+        G = cls.read(filename)
+        G.tofile(output_prefix + ".txt")
+        G.write_gml(output_prefix + ".gml")
 
+
+if __name__ == "__main__":
+    BidirectedOverlapGraph.direct_to_file(sys.argv[1], sys.argv[2])
