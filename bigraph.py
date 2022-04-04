@@ -9,8 +9,6 @@ class BidirectedOverlapGraph(object):
         self.maxOverhang = maxOverhang
 
         for seqV,seqH,rc,begV,endV,begH,endH,lenV,lenH in alignments:
-            if not (seqV-1) in self.graph:
-                self.graph[seqV-1] = {}
             e = {
               'transpose' :  0,
                     'dir' : -1,
@@ -22,16 +20,35 @@ class BidirectedOverlapGraph(object):
                    'lenV' : lenV, 'lenH' : lenH
                 }
 
-            self.graph[seqV-1][seqH-1] = e
+            if not e['rc']:
+                if e['begV'] > e['begH']:
+                    e['dir'] = 1
+                    e['suffix'] = e['lenH'] - e['endH']
+                    e['prefix'] = e['begV']
+                else:
+                    e['dir'] = 2
+                    e['suffix'] = e['begH']
+                    e['prefix'] = e['lenV'] - e['endV']
+            else:
+                if e['begV'] > 0 and e['begH'] > 0 and e['lenV']-e['endV'] == 0 and e['lenH']-e['endH'] == 0:
+                    e['dir'] = 0
+                    e['suffix'] = e['begH']
+                    e['prefix'] = e['begV']
+                else:
+                    e['dir'] = 3
+                    e['suffix'] = e['lenH'] - e['endH']
+                    e['prefix'] = e['lenV'] - e['endV']
 
-            if e['begV'] > 0 and e['begH'] < maxOverhang:
-                e['suffix'] = e['lenH'] - e['endH']
-                e['prefix'] = e['begV']
-                e['dir'] = 1 if not e['rc'] else 3
-            elif e['begH'] > 0 and e['begV'] < maxOverhang:
-                e['suffix'] = e['begH']
-                e['prefix'] = e['lenV'] - e['endV']
-                e['dir'] = 2 if not e['rc'] else 0
+            #  if e['begV'] > 0 and e['begH'] < maxOverhang:
+                #  e['suffix'] = e['lenH'] - e['endH']
+                #  e['prefix'] = e['begV']
+                #  e['dir'] = 1 if not e['rc'] else 3
+            #  elif e['begH'] > 0 and e['begV'] < maxOverhang:
+                #  e['suffix'] = e['begH']
+                #  e['prefix'] = e['lenV'] - e['endV']
+                #  e['dir'] = 2 if not e['rc'] else 0
+            #  else:
+                #  continue
 
             eT = {
               'transpose' :  1,
@@ -44,8 +61,13 @@ class BidirectedOverlapGraph(object):
                    'lenV' : lenV, 'lenH' : lenH
                  }
 
+            if not (seqV-1) in self.graph:
+                self.graph[seqV-1] = {}
+
             if (seqH-1) not in self.graph:
                 self.graph[seqH-1] = {}
+
+            self.graph[seqV-1][seqH-1] = e
             self.graph[seqH-1][seqV-1] = eT
 
     def write_gml(self, filename):
@@ -81,10 +103,14 @@ class BidirectedOverlapGraph(object):
 
     @classmethod
     def direct_to_file(cls, filename, output_prefix, maxOverhang=25):
-        G = cls.read(filename)
+        G = cls.read(filename, maxOverhang)
         G.tofile(output_prefix + ".txt")
         G.write_gml(output_prefix + ".gml")
 
 
 if __name__ == "__main__":
-    BidirectedOverlapGraph.direct_to_file(sys.argv[1], sys.argv[2])
+    if len(sys.argv) > 3:
+        print("running with maxOverhang={}".format(int(sys.argv[3])))
+        BidirectedOverlapGraph.direct_to_file(sys.argv[1], sys.argv[2], int(sys.argv[3]))
+    else:
+        BidirectedOverlapGraph.direct_to_file(sys.argv[1], sys.argv[2])
