@@ -39,17 +39,6 @@ class BidirectedOverlapGraph(object):
                     e['suffix'] = e['lenH'] - e['endH']
                     e['prefix'] = e['lenV'] - e['endV']
 
-            #  if e['begV'] > 0 and e['begH'] < maxOverhang:
-                #  e['suffix'] = e['lenH'] - e['endH']
-                #  e['prefix'] = e['begV']
-                #  e['dir'] = 1 if not e['rc'] else 3
-            #  elif e['begH'] > 0 and e['begV'] < maxOverhang:
-                #  e['suffix'] = e['begH']
-                #  e['prefix'] = e['lenV'] - e['endV']
-                #  e['dir'] = 2 if not e['rc'] else 0
-            #  else:
-                #  continue
-
             eT = {
               'transpose' :  1,
                     'dir' : e['dir'] if e['dir'] in {-1,0,3} else (3 - e['dir']),

@@ -1,2 +1,5 @@
 *.gml
 *.swp
+data/ecoli_hifi_29x.numbered.fa
+scripts/samclip
+example
